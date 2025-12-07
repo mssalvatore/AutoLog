@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Maintenance Log</title>
+    <style>
+        /* --- CSS for Styling the Form and Report --- */
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; 
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        input[readonly] {
+            background-color: #eee;
+            cursor: default;
+        }
+        .part-entry {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .part-entry input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .part-quantity {
+            flex: 0 0 50px !important; 
+        }
+        .part-cost {
+            flex: 0 0 100px !important;
+        }
+        .part-entry button {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        #addPart {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            margin-top: 10px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        #generateReport {
+            background-color: #28a745;
+            color: white;
+        }
+        #generateReport:hover {
+            background-color: #218838;
+        }
+        #resetForm {
+            background-color: #dc3545;
+            color: white;
+        }
+        #resetForm:hover {
+            background-color: #c82333;
+        }
+
+        /* --- Report Styling (Visible on Screen AFTER JS runs) --- */
+        #reportOutput {
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            display: none; /* Hidden by default, shown by JS */
+        }
+        #reportOutput h2 {
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .report-item {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .report-label {
+            font-weight: bold;
+            min-width: 150px;
+            color: #0056b3;
+        }
+        .report-value {
+            flex-grow: 1;
+            white-space: pre-wrap;
+        }
+        .report-parts-list {
+            list-style: disc;
+            margin-left: 20px;
+            padding-left: 0;
+        }
+        .report-parts-list li {
+            margin-bottom: 4px;
+        }
+        .report-total-cost {
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            color: #dc3545;
+        }
+
+        /* --- Print-Specific Styles (The Fix for blank printing) --- */
+        @media print {
+            /* 1. Hide the form and buttons explicitly, using their IDs/classes */
+            #maintenanceForm, .buttons {
+                display: none; 
+            }
+            
+            /* 2. Ensure the report is displayed, overriding the default 'display: none' */
+            #reportOutput {
+                display: block !important; 
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+            }
+            
+            /* 3. Ensure the main container doesn't accidentally hide content */
+            .container {
+                max-width: 100%;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🛠️ Vehicle Maintenance Log Entry</h1>
+        <form id="maintenanceForm">
+            <h2>Vehicle Information</h2>
+            <div class="form-group">
+                <label for="vehicleYear">Year:</label>
+                <input type="text" id="vehicleYear" readonly>
+            </div>
+            <div class="form-group">
+                <label for="vehicleMake">Make:</label>
+                <input type="text" id="vehicleMake" readonly>
+            </div>
+            <div class="form-group">
+                <label for="vehicleModel">Model:</label>
+                <input type="text" id="vehicleModel" readonly>
+            </div>
+            <div class="form-group">
+                <label for="vehicleVIN">VIN (Vehicle Identification Number):</label>
+                <input type="text" id="vehicleVIN" readonly>
+            </div>
+
+            <hr>
+
+            <h2>Maintenance Details</h2>
+            <div class="form-group">
+                <label for="maintenanceDate">Date of Service:</label>
+                <input type="date" id="maintenanceDate" required>
+            </div>
+            <div class="form-group">
+                <label for="mileage">Mileage / Hours at Service:</label>
+                <input type="number" id="mileage" required min="0" step="1">
+            </div>
+            <div class="form-group">
+                <label for="serviceType">Type of Service:</label>
+                <select id="serviceType" required>
+                    <option value="">-- Select Service Type --</option>
+                    <option value="Oil Change">Oil Change</option>
+                    <option value="Tire Rotation">Tire Rotation</option>
+                    <option value="Brake Service">Brake Service</option>
+                    <option value="General Inspection">General Inspection</option>
+                    <option value="Other Repair">Other Repair</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="workPerformed">Work Performed:</label>
+                <textarea id="workPerformed" placeholder="Detailed description of the services rendered, e.g., Flushed transmission fluid, Replaced front brake pads and rotors."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Parts Used (Qty | Part Name | Part # / Brand | **Cost (Each)**):</label>
+                <div id="partsContainer">
+                    </div>
+                <button type="button" id="addPart">➕ Add Part</button>
+            </div>
+
+            <div class="form-group">
+                <label for="nextServiceDue">Next Service Due (Mileage/Date):</label>
+                <input type="text" id="nextServiceDue" placeholder="E.g., 5,000 miles or January 2026">
+            </div>
+
+            <div class="buttons">
+                <button type="button" id="generateReport">Generate Report & Print</button>
+                <button type="button" id="resetForm">Reset Form</button>
+            </div>
+
+        </form>
+
+        <div id="reportOutput">
+            <h2>📄 Maintenance Log Report</h2>
+        </div>
+    </div>
+
+    <script>
+        // --- Vanilla JavaScript for Functionality ---
+
+        // Map URL parameters to their corresponding element IDs for easy setup
+        const fieldMap = {
+            'year': 'vehicleYear',
+            'make': 'vehicleMake',
+            'model': 'vehicleModel',
+            'vin': 'vehicleVIN'
+        };
+
+        // Attach Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeForm();
+            // Attach click listeners *after* the DOM content is loaded
+            document.getElementById('generateReport').addEventListener('click', generateAndPrintReport);
+            document.getElementById('resetForm').addEventListener('click', resetMaintenanceForm);
+            document.getElementById('addPart').addEventListener('click', addPartEntry);
+            
+            // Add the first part entry automatically
+            addPartEntry(); 
+        });
+
+        function initializeForm() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            for (const param in fieldMap) {
+                const value = urlParams.get(param);
+                const elementId = fieldMap[param];
+                const element = document.getElementById(elementId);
+
+                if (value && element) {
+                    element.value = decodeURIComponent(value);
+                    element.setAttribute('readonly', true);
+                }
+            }
+        }
+
+        function addPartEntry() {
+            const container = document.getElementById('partsContainer');
+            
+            const partDiv = document.createElement('div');
+            partDiv.className = 'part-entry';
+            
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.placeholder = 'Qty';
+            quantityInput.className = 'part-quantity';
+            quantityInput.min = '1';
+            quantityInput.value = '1';
+
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.placeholder = 'Part Name';
+            nameInput.className = 'part-name';
+            
+            const numberInput = document.createElement('input');
+            numberInput.type = 'text';
+            numberInput.placeholder = 'Part # / Brand';
+            numberInput.className = 'part-number';
+
+            const costInput = document.createElement('input');
+            costInput.type = 'number';
+            costInput.placeholder = 'Cost ($)';
+            costInput.className = 'part-cost';
+            costInput.min = '0';
+            costInput.step = '0.01';
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.textContent = 'X';
+            removeButton.onclick = () => container.removeChild(partDiv);
+
+            partDiv.appendChild(quantityInput);
+            partDiv.appendChild(nameInput);
+            partDiv.appendChild(numberInput);
+            partDiv.appendChild(costInput);
+            partDiv.appendChild(removeButton);
+
+            container.appendChild(partDiv);
+        }
+
+        function getPartsData() {
+            const parts = [];
+            const partEntries = document.querySelectorAll('.part-entry');
+            let totalCost = 0;
+            
+            partEntries.forEach(entry => {
+                // Use a default of 0 for quantity and cost if input is empty or invalid
+                const quantity = parseFloat(entry.querySelector('.part-quantity').value) || 0;
+                const name = entry.querySelector('.part-name').value.trim();
+                const number = entry.querySelector('.part-number').value.trim();
+                const cost = parseFloat(entry.querySelector('.part-cost').value) || 0;
+
+                // Only record parts that have meaningful data (name or number)
+                if (name || number) {
+                    const lineCost = quantity * cost;
+                    totalCost += lineCost;
+
+                    parts.push({ quantity, name, number, cost, lineCost });
+                }
+            });
+            
+            return { parts, totalCost };
+        }
+        
+        function generateAndPrintReport() {
+            const form = document.getElementById('maintenanceForm');
+            // Check HTML5 validity *before* proceeding
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const reportOutput = document.getElementById('reportOutput');
+            const { parts, totalCost } = getPartsData();
+            
+            // 1. Gather fixed form data
+            const fixedData = {
+                'Vehicle Year': document.getElementById('vehicleYear').value || 'N/A',
+                'Vehicle Make': document.getElementById('vehicleMake').value || 'N/A',
+                'Vehicle Model': document.getElementById('vehicleModel').value || 'N/A',
+                'VIN': document.getElementById('vehicleVIN').value || 'N/A',
+                'Date of Service': document.getElementById('maintenanceDate').value,
+                'Mileage / Hours': document.getElementById('mileage').value,
+                'Type of Service': document.getElementById('serviceType').value,
+                'Work Performed': document.getElementById('workPerformed').value.trim() || 'No detailed work description provided.',
+                'Next Service Due': document.getElementById('nextServiceDue').value.trim() || 'TBD'
+            };
+
+            // 2. Build the HTML report content
+            let reportHTML = '<h2>📄 Vehicle Maintenance Log</h2>';
+            
+            for (const key in fixedData) {
+                if (fixedData.hasOwnProperty(key)) {
+                    reportHTML += `
+                        <div class="report-item">
+                            <span class="report-label">${key}:</span>
+                            <span class="report-value">${fixedData[key]}</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            reportHTML += `
+                <div class="report-item" style="display:block;">
+                    <span class="report-label">Parts Used:</span>
+            `;
+            
+            if (parts.length > 0) {
+                reportHTML += '<ul class="report-parts-list">';
+                parts.forEach(part => {
+                    const numberDisplay = part.number ? ` (#${part.number})` : '';
+                    const costDisplay = part.cost > 0 ? ` @ $${part.cost.toFixed(2)}/ea (Total: $${part.lineCost.toFixed(2)})` : '';
+                    reportHTML += `<li>**${part.quantity}x** ${part.name}${numberDisplay}${costDisplay}</li>`;
+                });
+                reportHTML += '</ul>';
+                
+                reportHTML += `
+                    <div class="report-total-cost">
+                        Total Parts Cost: **$${totalCost.toFixed(2)}**
+                    </div>
+                `;
+
+            } else {
+                reportHTML += '<span class="report-value" style="font-style: italic;">No specific parts listed.</span>';
+            }
+
+            reportHTML += '</div>';
+
+            // 3. Update the DOM and print
+            reportOutput.innerHTML = reportHTML;
+            reportOutput.style.display = 'block'; 
+
+            window.print();
+        }
+
+        function resetMaintenanceForm() {
+            document.getElementById('maintenanceForm').reset();
+            document.getElementById('reportOutput').style.display = 'none';
+            
+            const partsContainer = document.getElementById('partsContainer');
+            partsContainer.innerHTML = '';
+            addPartEntry(); 
+            
+            initializeForm(); 
+        }
+
+    </script>
+</body>
+</html>
