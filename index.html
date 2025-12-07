@@ -154,11 +154,49 @@
         .report-parts-list li {
             margin-bottom: 4px;
         }
+        .report-parts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .report-parts-table th {
+            background-color: #0056b3;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+        .report-parts-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .report-parts-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        .report-parts-table .qty-col {
+            text-align: center;
+            width: 50px;
+        }
+        .report-parts-table .cost-col {
+            text-align: right;
+            width: 100px;
+        }
         .report-total-cost {
             font-weight: bold;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #ccc;
+            margin-top: 5px;
+            padding-top: 5px;
+            color: #333;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            align-items: center;
+        }
+        .report-total-cost > div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .report-total-cost > div:last-child {
             color: #dc3545;
         }
         .vehicle-info-horizontal {
@@ -212,6 +250,11 @@
 
         /* --- Print-Specific Styles (The Fix for blank printing) --- */
         @media print {
+            /* Set page to landscape orientation */
+            @page {
+                size: landscape;
+            }
+            
             /* 1. Hide the form and buttons explicitly, using their IDs/classes */
             #maintenanceForm, .buttons {
                 display: none; 
@@ -238,7 +281,7 @@
 <body>
 
     <div class="container">
-        <h1>🛠️ Vehicle Maintenance Log Entry</h1>
+        <h2>🛠️ Vehicle Maintenance Log Entry</h2>
         <form id="maintenanceForm">
             <h2>Vehicle Information</h2>
             <div class="form-group">
@@ -294,7 +337,7 @@
             </div>
 
             <div class="form-group">
-                <label>Parts Used (Qty | Part Name | Part # / Brand | **Cost (Each)**):</label>
+                <label>Parts Used (Qty | Part Name | Part # | Brand | Cost (Each)):</label>
                 <div id="partsContainer">
                     </div>
                 <button type="button" id="addPart">➕ Add Part</button>
@@ -347,6 +390,7 @@
             document.getElementById('generateReport').addEventListener('click', generateAndPrintReport);
             document.getElementById('resetForm').addEventListener('click', resetMaintenanceForm);
             document.getElementById('addPart').addEventListener('click', addPartEntry);
+            document.getElementById('serviceType').addEventListener('change', handleServiceTypeChange);
             
             // Add the first part entry automatically
             addPartEntry(); 
@@ -364,6 +408,40 @@
                     element.value = decodeURIComponent(value);
                     element.setAttribute('readonly', true);
                 }
+            }
+        }
+
+        function handleServiceTypeChange(event) {
+            const serviceType = event.target.value;
+            const workPerformedField = document.getElementById('workPerformed');
+            
+            // Only pre-fill if the field is currently empty
+            if (!workPerformedField.value.trim()) {
+                let defaultText = '';
+                
+                switch(serviceType) {
+                    case 'Oil Change':
+                        defaultText = `- Drain engine oil
+- Replace engine oil filter
+- Fill engine oil`;
+                        break;
+                    case 'Tire Rotation':
+                        defaultText = '- Rotate tires according to manufacturer\'s recommended pattern';
+                        break;
+                    case 'Brake Service':
+                        defaultText = '';
+                        break;
+                    case 'General Inspection':
+                        defaultText = '';
+                        break;
+                    case 'Other Repair':
+                        defaultText = '';
+                        break;
+                    default:
+                        defaultText = '';
+                }
+                
+                workPerformedField.value = defaultText;
             }
         }
 
@@ -387,8 +465,13 @@
             
             const numberInput = document.createElement('input');
             numberInput.type = 'text';
-            numberInput.placeholder = 'Part # / Brand';
+            numberInput.placeholder = 'Part #';
             numberInput.className = 'part-number';
+
+            const brandInput = document.createElement('input');
+            brandInput.type = 'text';
+            brandInput.placeholder = 'Brand';
+            brandInput.className = 'part-brand';
 
             const costInput = document.createElement('input');
             costInput.type = 'number';
@@ -405,6 +488,7 @@
             partDiv.appendChild(quantityInput);
             partDiv.appendChild(nameInput);
             partDiv.appendChild(numberInput);
+            partDiv.appendChild(brandInput);
             partDiv.appendChild(costInput);
             partDiv.appendChild(removeButton);
 
@@ -421,14 +505,15 @@
                 const quantity = parseFloat(entry.querySelector('.part-quantity').value) || 0;
                 const name = entry.querySelector('.part-name').value.trim();
                 const number = entry.querySelector('.part-number').value.trim();
+                const brand = entry.querySelector('.part-brand').value.trim();
                 const cost = parseFloat(entry.querySelector('.part-cost').value) || 0;
 
-                // Only record parts that have meaningful data (name or number)
-                if (name || number) {
+                // Only record parts that have meaningful data (name, number, or brand)
+                if (name || number || brand) {
                     const lineCost = quantity * cost;
                     totalCost += lineCost;
 
-                    parts.push({ quantity, name, number, cost, lineCost });
+                    parts.push({ quantity, name, number, brand, cost, lineCost });
                 }
             });
             
@@ -482,7 +567,7 @@
             };
 
             // 2. Build the HTML report content
-            let reportHTML = '<h2>📄 Vehicle Maintenance Log</h2>';
+            let reportHTML = '';
             
             // Display vehicle info horizontally
             reportHTML += '<div class="vehicle-info-horizontal">';
@@ -527,17 +612,46 @@
             `;
             
             if (parts.length > 0) {
-                reportHTML += '<ul class="report-parts-list">';
+                reportHTML += '<table class="report-parts-table">';
+                reportHTML += `
+                    <thead>
+                        <tr>
+                            <th class="qty-col">Qty</th>
+                            <th>Part Name</th>
+                            <th>Part #</th>
+                            <th>Brand</th>
+                            <th class="cost-col">Unit Cost</th>
+                            <th class="cost-col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
                 parts.forEach(part => {
-                    const numberDisplay = part.number ? ` (#${part.number})` : '';
-                    const costDisplay = part.cost > 0 ? ` @ $${part.cost.toFixed(2)}/ea (Total: $${part.lineCost.toFixed(2)})` : '';
-                    reportHTML += `<li>**${part.quantity}x** ${part.name}${numberDisplay}${costDisplay}</li>`;
+                    const partNumber = part.number || '—';
+                    const brand = part.brand || '—';
+                    const unitCost = part.cost > 0 ? `$${part.cost.toFixed(2)}` : '—';
+                    const lineTotal = part.cost > 0 ? `$${part.lineCost.toFixed(2)}` : '—';
+                    reportHTML += `
+                        <tr>
+                            <td class="qty-col">${part.quantity}</td>
+                            <td>${part.name || '—'}</td>
+                            <td>${partNumber}</td>
+                            <td>${brand}</td>
+                            <td class="cost-col">${unitCost}</td>
+                            <td class="cost-col">${lineTotal}</td>
+                        </tr>
+                    `;
                 });
-                reportHTML += '</ul>';
+                reportHTML += '</tbody></table>';
+                
+                const salesTax = totalCost * 0.06;
+                const totalWithTax = totalCost + salesTax;
                 
                 reportHTML += `
                     <div class="report-total-cost">
-                        Total Parts Cost: **$${totalCost.toFixed(2)}**
+                        <div>Subtotal: <span>$${totalCost.toFixed(2)}</span></div>
+                        <div>Sales Tax (6%): <span>$${salesTax.toFixed(2)}</span></div>
+                        <div><strong>Total: $${totalWithTax.toFixed(2)}</strong></div>
                     </div>
                 `;
 
