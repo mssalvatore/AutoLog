@@ -52,6 +52,17 @@
             background-color: #eee;
             cursor: default;
         }
+        .inline-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .inline-group input {
+            flex: 1;
+        }
+        .inline-group select {
+            flex: 0 0 120px;
+        }
         .part-entry {
             display: flex;
             gap: 10px;
@@ -150,6 +161,54 @@
             border-top: 1px solid #ccc;
             color: #dc3545;
         }
+        .vehicle-info-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .vehicle-info-horizontal .report-item {
+            margin-bottom: 0;
+            flex: 0 0 auto;
+        }
+        .vehicle-info-horizontal .report-label {
+            min-width: auto;
+            margin-right: 5px;
+        }
+        .service-info-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .service-info-horizontal .report-item {
+            margin-bottom: 0;
+            flex: 0 0 auto;
+        }
+        .service-info-horizontal .report-label {
+            min-width: auto;
+            margin-right: 5px;
+        }
+        .next-service-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .next-service-horizontal .report-item {
+            margin-bottom: 0;
+            flex: 0 0 auto;
+        }
+        .next-service-horizontal .report-label {
+            min-width: auto;
+            margin-right: 5px;
+        }
 
         /* --- Print-Specific Styles (The Fix for blank printing) --- */
         @media print {
@@ -208,7 +267,14 @@
             </div>
             <div class="form-group">
                 <label for="mileage">Mileage / Hours at Service:</label>
-                <input type="number" id="mileage" required min="0" step="1">
+                <div class="inline-group">
+                    <input type="number" id="mileage" required min="0" step="1">
+                    <select id="mileageUnit">
+                        <option value="miles" selected>Miles</option>
+                        <option value="kilometers">Kilometers</option>
+                        <option value="hours">Hours</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group">
                 <label for="serviceType">Type of Service:</label>
@@ -235,8 +301,20 @@
             </div>
 
             <div class="form-group">
-                <label for="nextServiceDue">Next Service Due (Mileage/Date):</label>
-                <input type="text" id="nextServiceDue" placeholder="E.g., 5,000 miles or January 2026">
+                <label for="nextServiceDueMileage">Next Service Due (Mileage/Hours):</label>
+                <div class="inline-group">
+                    <input type="number" id="nextServiceDueMileage" placeholder="E.g., 5000" min="0" step="1">
+                    <select id="nextServiceMileageUnit">
+                        <option value="miles" selected>Miles</option>
+                        <option value="kilometers">Kilometers</option>
+                        <option value="hours">Hours</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="nextServiceDueDate">Next Service Due (Date):</label>
+                <input type="date" id="nextServiceDueDate">
             </div>
 
             <div class="buttons">
@@ -369,31 +447,79 @@
             const { parts, totalCost } = getPartsData();
             
             // 1. Gather fixed form data
+            const mileageValue = document.getElementById('mileage').value;
+            const mileageUnit = document.getElementById('mileageUnit').value;
+            const nextServiceMileage = document.getElementById('nextServiceDueMileage').value.trim();
+            const nextServiceMileageUnit = document.getElementById('nextServiceMileageUnit').value;
+            const nextServiceDate = document.getElementById('nextServiceDueDate').value;
+            
+            // Build the "Next Service Due" string
+            let nextServiceDue = '';
+            if (nextServiceMileage) {
+                nextServiceDue = `${nextServiceMileage} ${nextServiceMileageUnit}`;
+            }
+            if (nextServiceDate) {
+                if (nextServiceDue) {
+                    nextServiceDue += ` or ${nextServiceDate}`;
+                } else {
+                    nextServiceDue = nextServiceDate;
+                }
+            }
+            if (!nextServiceDue) {
+                nextServiceDue = 'TBD';
+            }
+            
             const fixedData = {
                 'Vehicle Year': document.getElementById('vehicleYear').value || 'N/A',
                 'Vehicle Make': document.getElementById('vehicleMake').value || 'N/A',
                 'Vehicle Model': document.getElementById('vehicleModel').value || 'N/A',
                 'VIN': document.getElementById('vehicleVIN').value || 'N/A',
                 'Date of Service': document.getElementById('maintenanceDate').value,
-                'Mileage / Hours': document.getElementById('mileage').value,
+                'Mileage / Hours': `${mileageValue} ${mileageUnit}`,
                 'Type of Service': document.getElementById('serviceType').value,
                 'Work Performed': document.getElementById('workPerformed').value.trim() || 'No detailed work description provided.',
-                'Next Service Due': document.getElementById('nextServiceDue').value.trim() || 'TBD'
+                'Next Service Due': nextServiceDue
             };
 
             // 2. Build the HTML report content
             let reportHTML = '<h2>📄 Vehicle Maintenance Log</h2>';
             
-            for (const key in fixedData) {
-                if (fixedData.hasOwnProperty(key)) {
-                    reportHTML += `
-                        <div class="report-item">
-                            <span class="report-label">${key}:</span>
-                            <span class="report-value">${fixedData[key]}</span>
-                        </div>
-                    `;
-                }
-            }
+            // Display vehicle info horizontally
+            reportHTML += '<div class="vehicle-info-horizontal">';
+            const vehicleFields = ['Vehicle Year', 'Vehicle Make', 'Vehicle Model', 'VIN'];
+            vehicleFields.forEach(key => {
+                reportHTML += `
+                    <div class="report-item">
+                        <span class="report-label">${key}:</span>
+                        <span class="report-value">${fixedData[key]}</span>
+                    </div>
+                `;
+            });
+            reportHTML += '</div>';
+            
+            // Display service info horizontally
+            reportHTML += '<div class="service-info-horizontal">';
+            const serviceFields = ['Date of Service', 'Mileage / Hours'];
+            serviceFields.forEach(key => {
+                reportHTML += `
+                    <div class="report-item">
+                        <span class="report-label">${key}:</span>
+                        <span class="report-value">${fixedData[key]}</span>
+                    </div>
+                `;
+            });
+            reportHTML += '</div>';
+            
+            // Display remaining fields vertically
+            const remainingFields = ['Type of Service', 'Work Performed'];
+            remainingFields.forEach(key => {
+                reportHTML += `
+                    <div class="report-item">
+                        <span class="report-label">${key}:</span>
+                        <span class="report-value">${fixedData[key]}</span>
+                    </div>
+                `;
+            });
             
             reportHTML += `
                 <div class="report-item" style="display:block;">
@@ -419,6 +545,16 @@
                 reportHTML += '<span class="report-value" style="font-style: italic;">No specific parts listed.</span>';
             }
 
+            reportHTML += '</div>';
+            
+            // Display next service due horizontally at the end
+            reportHTML += '<div class="next-service-horizontal">';
+            reportHTML += `
+                <div class="report-item">
+                    <span class="report-label">Next Service Due:</span>
+                    <span class="report-value">${fixedData['Next Service Due']}</span>
+                </div>
+            `;
             reportHTML += '</div>';
 
             // 3. Update the DOM and print
