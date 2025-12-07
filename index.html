@@ -250,9 +250,22 @@
 
         /* --- Print-Specific Styles (The Fix for blank printing) --- */
         @media print {
-            /* Set page to landscape orientation */
+            /* Set page to landscape orientation and remove default headers/footers */
             @page {
                 size: landscape;
+                margin: 0.5in;
+            }
+            
+            /* Hide default browser headers and footers */
+            @page {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            
+            /* Remove body margins */
+            body {
+                margin: 0;
+                padding: 0;
             }
             
             /* 1. Hide the form and buttons explicitly, using their IDs/classes */
@@ -274,6 +287,14 @@
             .container {
                 max-width: 100%;
                 box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* 4. Remove extra spacing from the header */
+            h2 {
+                margin-top: 1em;
+                padding-top: 0;
             }
         }
     </style>
