@@ -524,6 +524,10 @@
             container.appendChild(partDiv);
         }
 
+        function formatNumberWithCommas(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
         function getPartsData() {
             const parts = [];
             const partEntries = document.querySelectorAll('.part-entry');
@@ -570,7 +574,7 @@
             // Build the "Next Service Due" string
             let nextServiceDue = '';
             if (nextServiceMileage) {
-                nextServiceDue = `${nextServiceMileage} ${nextServiceMileageUnit}`;
+                nextServiceDue = `${formatNumberWithCommas(nextServiceMileage)} ${nextServiceMileageUnit}`;
             }
             if (nextServiceDate) {
                 if (nextServiceDue) {
@@ -589,7 +593,7 @@
                 'Vehicle Model': document.getElementById('vehicleModel').value || 'N/A',
                 'VIN': document.getElementById('vehicleVIN').value || 'N/A',
                 'Date of Service': document.getElementById('maintenanceDate').value,
-                'Mileage / Hours': `${mileageValue} ${mileageUnit}`,
+                'Mileage / Hours': `${formatNumberWithCommas(mileageValue)} ${mileageUnit}`,
                 'Type of Service': document.getElementById('serviceType').value,
                 'Work Performed': document.getElementById('workPerformed').value.trim() || 'No detailed work description provided.',
                 'Next Service Due': nextServiceDue
