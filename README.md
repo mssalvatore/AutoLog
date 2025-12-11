@@ -18,3 +18,8 @@ $ python -m http.server
 
 Then use your browser to access your server.
 
+<img src="images/example-form.png" width="800px"/>
+
+Fill in the form click "Generate Report & Print". 
+
+<img src="images/example-report.png" width="800px"/>
