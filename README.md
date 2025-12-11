@@ -16,7 +16,12 @@ Python's built-in web server.
 $ python -m http.server
 ```
 
-Then use your browser to access your server.
+Then use your browser to access your server. The year, make, model, and VIN are
+passed as query parameters in the URL.
+
+__Example:__
+http://localhost:8000/?year=2023&make=Honda&model=Odyssey&vin=012345689ABCDEFG
+
 
 <img src="images/example-form.png" width="800px"/>
 
