@@ -140,7 +140,7 @@
                         const roundLabel = document.createElement('div');
                         roundLabel.style.fontSize = '12px';
                         roundLabel.style.color = '#666';
-                        roundLabel.style.marginBottom = '8px';
+                        roundLabel.style.marginBottom = '4px';
                         roundLabel.textContent = `Test ${testRound}`;
                         tireSection.appendChild(roundLabel);
                     }
@@ -152,7 +152,7 @@
                         const fieldContainer = document.createElement('div');
                         fieldContainer.style.display = 'flex';
                         fieldContainer.style.flexDirection = 'column';
-                        fieldContainer.style.gap = '3px';
+                        fieldContainer.style.gap = '1px';
                         
                         const label = document.createElement('div');
                         label.className = 'measurement-label';
@@ -225,7 +225,7 @@
             });
             
             // Add tire name as heading
-            html += `<h4 style="color: #0056b3; margin-top: 0; margin-bottom: 10px; text-align: center;">${tire.name}</h4>`;
+            html += `<h4 class="tire-report-heading">${tire.name}</h4>`;
             
             html += '<table class="report-table" style="margin-bottom: 0;">';
             html += '<thead><tr>';
