@@ -21,6 +21,13 @@
     font-weight: bold;
     font-size: 16px;
 }
+.tire-tread-comments {
+    display: flex;
+}
+.tire-tread-comments .report-label {
+    min-width: 100px;
+    margin-right: 10px;
+}
 .measurement-entry {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
