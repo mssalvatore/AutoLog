@@ -459,7 +459,7 @@
                 let avgColor = '#333';
                 if (validMeasurements.length > 0) {
                     const sum = validMeasurements.reduce((a, b) => a + b, 0);
-                    const avgValue = (sum / validMeasurements.length).toFixed(1);
+                    const avgValue = Math.round(sum / validMeasurements.length);
                     average = `${avgValue}/32"`;
                     if (avgValue > 4) {
                         avgColor = '#28a745'; // Green
@@ -484,13 +484,13 @@
             let tireAverage = '—';
             if (allMeasurements.length > 0) {
                 const sum = allMeasurements.reduce((a, b) => a + b, 0);
-                const avgValue = (sum / allMeasurements.length).toFixed(1);
+                const avgValue = Math.round(sum / allMeasurements.length);
                 tireAverage = `${avgValue}/32"`;
             }
             
             let avgColor = '#0056b3';
             if (tireAverage !== '—') {
-                const numValue = parseFloat(tireAverage);
+                const numValue = parseInt(tireAverage);
                 if (numValue > 4) {
                     avgColor = '#28a745'; // Green
                 } else if (numValue > 2) {
