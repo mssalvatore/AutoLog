@@ -8,8 +8,8 @@ physical logbook.
 
 ## How to
 
-To use AutoLog, configure any web server to serve the `index.html` file and
-`images/` directory. A quick and dirty way to get up and running is to use
+To use AutoLog, configure any web server to serve the `maintenance.html` file and
+associated directories. A quick and dirty way to get up and running is to use
 Python's built-in web server.
 
 ```bash
@@ -20,7 +20,7 @@ Then use your browser to access your server. The year, make, model, and VIN are
 passed as query parameters in the URL.
 
 __Example:__
-http://localhost:8000/?year=2023&make=Honda&model=Odyssey&vin=012345689ABCDEFG
+http://localhost:8000/maintenance.html/?year=2023&make=Honda&model=Odyssey&vin=012345689ABCDEFG
 
 
 <img src="images/example-form.png" width="800px"/>
