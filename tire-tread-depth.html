@@ -207,7 +207,6 @@
                 <div class="config-row">
                     <label for="numMeasurements">Number of measurements per tire:</label>
                     <input type="number" id="numMeasurements" value="3" min="1" max="20">
-                    <button type="button" id="updateConfig">Generate Fields</button>
                 </div>
                 <div class="config-row">
                     <label for="numTests">Number of test rounds:</label>
@@ -281,7 +280,8 @@
             generateTireFields();
             
             // Attach event listeners
-            document.getElementById('updateConfig').addEventListener('click', generateTireFields);
+            document.getElementById('numMeasurements').addEventListener('change', generateTireFields);
+            document.getElementById('numTests').addEventListener('change', generateTireFields);
             document.getElementById('generateReport').addEventListener('click', generateAndPrintReport);
             document.getElementById('resetForm').addEventListener('click', resetForm);
         });
