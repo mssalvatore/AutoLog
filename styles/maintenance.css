@@ -1,0 +1,69 @@
+/* Maintenance Form Specific Styles */
+
+.part-entry {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+.part-entry input {
+    flex: 1;
+    margin-bottom: 0;
+}
+.part-quantity {
+    flex: 0 0 50px !important; 
+}
+.part-cost {
+    flex: 0 0 100px !important;
+}
+.part-entry button {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+#addPart {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 15px;
+    margin-top: 10px;
+}
+
+.report-parts-list {
+    list-style: disc;
+    margin-left: 20px;
+    padding-left: 0;
+}
+.report-parts-list li {
+    margin-bottom: 4px;
+}
+.report-total-cost {
+    font-weight: bold;
+    margin-top: 5px;
+    padding-top: 5px;
+    color: #333;
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    align-items: center;
+}
+.report-total-cost > div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.report-total-cost > div:last-child {
+    color: #dc3545;
+}
+
+/* Print-Specific Styles for Maintenance */
+@media print {
+    /* Set page to landscape orientation and remove default headers/footers */
+    @page {
+        size: landscape;
+        margin: 0.5in;
+        /* Hide default browser headers and footers */
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}

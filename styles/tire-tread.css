@@ -1,0 +1,124 @@
+/* Tire Tread Specific Styles */
+
+.tire-section {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-left: 4px solid #0056b3;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+.tire-title {
+    font-weight: bold;
+    color: #0056b3;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+.measurement-entry {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.measurement-entry input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.measurement-label {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 3px;
+}
+.config-section {
+    background-color: #e3f2fd;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #90caf9;
+}
+.config-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.config-row label {
+    margin-bottom: 0;
+    font-weight: bold;
+    min-width: 200px;
+}
+.config-row input {
+    width: 80px !important;
+    padding: 8px !important;
+}
+.config-row button {
+    background-color: #2196F3;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.config-row button:hover {
+    background-color: #1976D2;
+}
+.tire-name {
+    display: inline-block;
+    background-color: #0056b3;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+.report-tire-section {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #0056b3;
+    border-radius: 4px;
+}
+.report-tire-title {
+    font-weight: bold;
+    color: #0056b3;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+.tire-measurements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+.tire-measurement-box {
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+}
+.tire-measurement-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+.tire-measurement-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: #0056b3;
+}
+
+/* Print-Specific Styles for Tire Tread */
+@media print {
+    /* Set page to portrait orientation and remove default headers/footers */
+    @page {
+        size: portrait;
+        margin: 0.5in;
+        /* Hide default browser headers and footers */
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}

@@ -1,3 +1,5 @@
+/* Common Shared Styles */
+
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -54,34 +56,6 @@ input[readonly] {
 .inline-group select {
     flex: 0 0 120px;
 }
-.part-entry {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 8px;
-    align-items: center;
-}
-.part-entry input {
-    flex: 1;
-    margin-bottom: 0;
-}
-.part-quantity {
-    flex: 0 0 50px !important; 
-}
-.part-cost {
-    flex: 0 0 100px !important;
-}
-.part-entry button {
-    background-color: #dc3545;
-    color: white;
-    padding: 8px 12px;
-    font-size: 14px;
-}
-#addPart {
-    background-color: #007bff;
-    color: white;
-    padding: 8px 15px;
-    margin-top: 10px;
-}
 .buttons {
     display: flex;
     justify-content: space-between;
@@ -137,38 +111,30 @@ button {
     flex-grow: 1;
     white-space: pre-wrap;
 }
-.report-parts-list {
-    list-style: disc;
-    margin-left: 20px;
-    padding-left: 0;
-}
-.report-parts-list li {
-    margin-bottom: 4px;
-}
-.report-parts-table {
+.report-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
 }
-.report-parts-table th {
+.report-table th {
     background-color: #0056b3;
     color: white;
     padding: 8px;
     text-align: left;
     font-weight: bold;
 }
-.report-parts-table td {
+.report-table td {
     padding: 8px;
     border-bottom: 1px solid #ddd;
 }
-.report-parts-table tr:hover {
+.report-table tr:hover {
     background-color: #f5f5f5;
 }
-.report-parts-table .qty-col {
+.report-table .qty-col {
     text-align: center;
     width: 50px;
 }
-.report-parts-table .cost-col {
+.report-table .cost-col {
     text-align: right;
     width: 100px;
 }
@@ -239,32 +205,15 @@ button {
     margin-right: 5px;
 }
 
-/* --- Print-Specific Styles (The Fix for blank printing) --- */
+/* --- Print-Specific Styles (Shared across all pages) --- */
 @media print {
-    /* Set page to landscape orientation and remove default headers/footers */
-    @page {
-        size: landscape;
-        margin: 0.5in;
-    }
-    
-    /* Hide default browser headers and footers */
-    @page {
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-    
     /* Remove body margins */
     body {
         margin: 0;
         padding: 0;
     }
     
-    /* 1. Hide the form and buttons explicitly, using their IDs/classes */
-    #maintenanceForm, .buttons {
-        display: none; 
-    }
-    
-    /* 2. Ensure the report is displayed, overriding the default 'display: none' */
+    /* Ensure the report is displayed, overriding the default 'display: none' */
     #reportOutput {
         display: block !important; 
         border: none;
@@ -274,7 +223,7 @@ button {
         width: 100%;
     }
     
-    /* 3. Ensure the main container doesn't accidentally hide content */
+    /* Ensure the main container doesn't accidentally hide content */
     .container {
         max-width: 100%;
         box-shadow: none;
@@ -282,14 +231,19 @@ button {
         padding: 0;
     }
     
-    /* 4. Remove extra spacing from the header */
+    /* Remove extra spacing from the header */
     h2 {
         margin-top: 1em;
         padding-top: 0;
     }
     
-    /* 5. Preserve table header background color */
-    .report-parts-table th {
+    /* Hide data entry forms explicitly */
+    .data-form, .buttons {
+        display: none;
+    }
+    
+    /* Preserve table header background color */
+    .report-table th {
         background-color: #0056b3 !important;
         color: white !important;
         -webkit-print-color-adjust: exact;

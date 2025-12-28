@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vehicle Maintenance Log</title>
     <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/maintenance.css">
     <script src="javascript/common.js"></script>
 </head>
 <body>
     <div class="container">
         <h2><img src="images/icon.svg" alt="Vehicle Maintenance" style="width: 32px; height: 32px; vertical-align: middle;"> Vehicle Maintenance Log Entry</h2>
-        <form id="maintenanceForm">
+        <form id="maintenanceForm" class="data-form">
             <h2>Vehicle Information</h2>
             <div class="form-group">
                 <label for="vehicleYear">Year:</label>
@@ -317,7 +318,7 @@
             `;
             
             if (parts.length > 0) {
-                reportHTML += '<table class="report-parts-table">';
+                reportHTML += '<table class="report-table">';
                 reportHTML += `
                     <thead>
                         <tr>
