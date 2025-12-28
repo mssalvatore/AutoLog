@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tire Tread Depth Report</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="common.js"></script>
     <style>
         /* Tire-specific styles */
         .tire-section {
@@ -228,15 +229,7 @@
             'Spare'
         ];
 
-        // Map URL parameters to vehicle fields
-        const fieldMap = {
-            'year': 'vehicleYear',
-            'make': 'vehicleMake',
-            'model': 'vehicleModel',
-            'vin': 'vehicleVIN'
-        };
-
-        // Initialize form on page load
+        // Attach event listeners on page load
         document.addEventListener('DOMContentLoaded', () => {
             initializeForm();
             generateTireFields();
@@ -247,21 +240,6 @@
             document.getElementById('generateReport').addEventListener('click', generateAndPrintReport);
             document.getElementById('resetForm').addEventListener('click', resetForm);
         });
-
-        function initializeForm() {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            for (const param in fieldMap) {
-                const value = urlParams.get(param);
-                const elementId = fieldMap[param];
-                const element = document.getElementById(elementId);
-
-                if (value && element) {
-                    element.value = decodeURIComponent(value);
-                    element.setAttribute('readonly', true);
-                }
-            }
-        }
 
         function generateTireFields() {
             const numMeasurements = parseInt(document.getElementById('numMeasurements').value) || 3;
@@ -328,10 +306,6 @@
                 
                 tireContainer.appendChild(tireSection);
             });
-        }
-
-        function formatNumberWithCommas(number) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
         function getTireData() {

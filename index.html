@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vehicle Maintenance Log</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="common.js"></script>
 </head>
 <body>
     <div class="container">
@@ -102,14 +103,6 @@
     <script>
         // --- Vanilla JavaScript for Functionality ---
 
-        // Map URL parameters to their corresponding element IDs for easy setup
-        const fieldMap = {
-            'year': 'vehicleYear',
-            'make': 'vehicleMake',
-            'model': 'vehicleModel',
-            'vin': 'vehicleVIN'
-        };
-
         // Attach Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
             initializeForm();
@@ -120,23 +113,8 @@
             document.getElementById('serviceType').addEventListener('change', handleServiceTypeChange);
             
             // Add the first part entry automatically
-            addPartEntry(); 
+            initializeForm();
         });
-
-        function initializeForm() {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            for (const param in fieldMap) {
-                const value = urlParams.get(param);
-                const elementId = fieldMap[param];
-                const element = document.getElementById(elementId);
-
-                if (value && element) {
-                    element.value = decodeURIComponent(value);
-                    element.setAttribute('readonly', true);
-                }
-            }
-        }
 
         function handleServiceTypeChange(event) {
             const serviceType = event.target.value;
@@ -220,10 +198,6 @@
             partDiv.appendChild(removeButton);
 
             container.appendChild(partDiv);
-        }
-
-        function formatNumberWithCommas(number) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
 
         function getPartsData() {
