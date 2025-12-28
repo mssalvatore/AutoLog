@@ -436,10 +436,11 @@
                     let displayValue = '—';
                     let color = '#333';
                     if (measurement !== null) {
-                        displayValue = Math.round(measurement);
-                        if (displayValue > 4) {
+                        const value = Math.round(measurement);
+                        displayValue = `${value}/32"`;
+                        if (value > 4) {
                             color = '#28a745'; // Green
-                        } else if (displayValue > 2) {
+                        } else if (value > 2) {
                             color = '#ff9800'; // Orange
                         } else {
                             color = '#dc3545'; // Red
@@ -458,10 +459,11 @@
                 let avgColor = '#333';
                 if (validMeasurements.length > 0) {
                     const sum = validMeasurements.reduce((a, b) => a + b, 0);
-                    average = (sum / validMeasurements.length).toFixed(1);
-                    if (average > 4) {
+                    const avgValue = (sum / validMeasurements.length).toFixed(1);
+                    average = `${avgValue}/32"`;
+                    if (avgValue > 4) {
                         avgColor = '#28a745'; // Green
-                    } else if (average > 2) {
+                    } else if (avgValue > 2) {
                         avgColor = '#ff9800'; // Orange
                     } else {
                         avgColor = '#dc3545'; // Red
@@ -482,14 +484,16 @@
             let tireAverage = '—';
             if (allMeasurements.length > 0) {
                 const sum = allMeasurements.reduce((a, b) => a + b, 0);
-                tireAverage = (sum / allMeasurements.length).toFixed(1);
+                const avgValue = (sum / allMeasurements.length).toFixed(1);
+                tireAverage = `${avgValue}/32"`;
             }
             
             let avgColor = '#0056b3';
             if (tireAverage !== '—') {
-                if (tireAverage > 4) {
+                const numValue = parseFloat(tireAverage);
+                if (numValue > 4) {
                     avgColor = '#28a745'; // Green
-                } else if (tireAverage > 2) {
+                } else if (numValue > 2) {
                     avgColor = '#ff9800'; // Orange
                 } else {
                     avgColor = '#dc3545'; // Red
