@@ -377,14 +377,14 @@
                         <span class="report-value">${comments}</span>
                     </div>
                 `;
-                reportHTML += '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
+                reportHTML += '<hr style="margin: 10px 0; border: none; border-top: 1px solid #ddd;">';
             }
             
             // Tire measurements - organized by position (front, rear, spare)
-            reportHTML += '<h3 style="color: #0056b3; margin-bottom: 15px;">Tire Tread Depth Measurements (in 32nds of an inch)</h3>';
+            reportHTML += '<h3 style="color: #0056b3; margin-bottom: 15px; margin-top: 5px;">Tire Tread Depth Measurements (in 32nds of an inch)</h3>';
             
             // Front tires (indices 0 and 1) - side by side
-            reportHTML += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">';
+            reportHTML += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px;">';
             
             for (let tireIndex = 0; tireIndex <= 1; tireIndex++) {
                 const tire = tires[tireIndex];
@@ -396,7 +396,7 @@
             reportHTML += '</div>';
             
             // Rear tires (indices 2 and 3) - side by side
-            reportHTML += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">';
+            reportHTML += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px;">';
             
             for (let tireIndex = 2; tireIndex <= 3; tireIndex++) {
                 const tire = tires[tireIndex];
