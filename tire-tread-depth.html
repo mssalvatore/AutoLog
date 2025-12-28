@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tire Tread Depth Report</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Tire-specific styles */
+        .tire-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #0056b3;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .tire-title {
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .measurement-entry {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .measurement-entry input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .measurement-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 3px;
+        }
+        .config-section {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #90caf9;
+        }
+        .config-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .config-row label {
+            margin-bottom: 0;
+            font-weight: bold;
+            min-width: 200px;
+        }
+        .config-row input {
+            width: 80px !important;
+            padding: 8px !important;
+        }
+        .config-row button {
+            background-color: #2196F3;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .config-row button:hover {
+            background-color: #1976D2;
+        }
+        .tire-name {
+            display: inline-block;
+            background-color: #0056b3;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .report-tire-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #0056b3;
+            border-radius: 4px;
+        }
+        .report-tire-title {
+            font-weight: bold;
+            color: #0056b3;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .tire-measurements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        .tire-measurement-box {
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .tire-measurement-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .tire-measurement-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0056b3;
+        }
+        
+        /* --- Print-Specific Styles --- */
+        @media print {
+            /* Set page to portrait orientation and remove default headers/footers */
+            @page {
+                size: portrait;
+                margin: 0.5in;
+            }
+            
+            /* Hide default browser headers and footers */
+            @page {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            
+            /* Remove body margins */
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* Hide the form and buttons explicitly */
+            #tireForm, .buttons {
+                display: none; 
+            }
+            
+            /* Ensure the report is displayed, overriding the default 'display: none' */
+            #reportOutput {
+                display: block !important; 
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+            }
+            
+            /* Ensure the main container doesn't accidentally hide content */
+            .container {
+                max-width: 100%;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* Remove extra spacing from the header */
+            h2 {
+                margin-top: 1em;
+                padding-top: 0;
+            }
+            
+            /* Preserve table header background color */
+            .report-parts-table th {
+                background-color: #0056b3 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2><img src="images/icon.svg" alt="Tire Tread" style="width: 32px; height: 32px; vertical-align: middle;"> Tire Tread Depth Report</h2>
+        
+        <form id="tireForm">
+            <h2>Vehicle Information</h2>
+            <div class="form-group">
+                <label for="vehicleYear">Year:</label>
+                <input type="text" id="vehicleYear" readonly>
+            </div>
+            <div class="form-group">
+                <label for="vehicleMake">Make:</label>
+                <input type="text" id="vehicleMake" readonly>
+            </div>
+            <div class="form-group">
+                <label for="vehicleModel">Model:</label>
+                <input type="text" id="vehicleModel" readonly>
+            </div>
+            <div class="form-group">
+                <label for="vehicleVIN">VIN (Vehicle Identification Number):</label>
+                <input type="text" id="vehicleVIN" readonly>
+            </div>
+
+            <hr>
+
+            <h2>Measurement Configuration</h2>
+            <div class="config-section">
+                <div class="config-row">
+                    <label for="numMeasurements">Number of measurements per tire:</label>
+                    <input type="number" id="numMeasurements" value="3" min="1" max="20">
+                    <button type="button" id="updateConfig">Generate Fields</button>
+                </div>
+                <div class="config-row">
+                    <label for="numTests">Number of test rounds:</label>
+                    <input type="number" id="numTests" value="1" min="1" max="10">
+                </div>
+            </div>
+
+            <hr>
+
+            <h2>Inspection Details</h2>
+            <div class="form-group">
+                <label for="inspectionDate">Date of Inspection:</label>
+                <input type="date" id="inspectionDate" required>
+            </div>
+            <div class="form-group">
+                <label for="mileage">Mileage / Hours at Inspection:</label>
+                <div class="inline-group">
+                    <input type="number" id="mileage" required min="0" step="1">
+                    <select id="mileageUnit">
+                        <option value="miles" selected>Miles</option>
+                        <option value="kilometers">Kilometers</option>
+                        <option value="hours">Hours</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="comments">Comments:</label>
+                <textarea id="comments" placeholder="Any additional notes or observations about tire condition"></textarea>
+            </div>
+
+            <hr>
+
+            <h2>Tire Tread Depth Measurements (in 32nds of an inch)</h2>
+            <div id="tireContainer">
+                <!-- This will be populated by JavaScript based on configuration -->
+            </div>
+
+            <div class="buttons">
+                <button type="button" id="generateReport">Generate Report & Print</button>
+                <button type="button" id="resetForm">Reset Form</button>
+            </div>
+
+        </form>
+
+        <div id="reportOutput">
+            <h2>📄 Tire Tread Depth Report</h2>
+        </div>
+    </div>
+
+    <script>
+        // Tire names for labeling
+        const TIRE_NAMES = [
+            'Front Driver',
+            'Front Passenger',
+            'Rear Driver',
+            'Rear Passenger',
+            'Spare'
+        ];
+
+        // Map URL parameters to vehicle fields
+        const fieldMap = {
+            'year': 'vehicleYear',
+            'make': 'vehicleMake',
+            'model': 'vehicleModel',
+            'vin': 'vehicleVIN'
+        };
+
+        // Initialize form on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeForm();
+            generateTireFields();
+            
+            // Attach event listeners
+            document.getElementById('updateConfig').addEventListener('click', generateTireFields);
+            document.getElementById('generateReport').addEventListener('click', generateAndPrintReport);
+            document.getElementById('resetForm').addEventListener('click', resetForm);
+        });
+
+        function initializeForm() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            for (const param in fieldMap) {
+                const value = urlParams.get(param);
+                const elementId = fieldMap[param];
+                const element = document.getElementById(elementId);
+
+                if (value && element) {
+                    element.value = decodeURIComponent(value);
+                    element.setAttribute('readonly', true);
+                }
+            }
+        }
+
+        function generateTireFields() {
+            const numMeasurements = parseInt(document.getElementById('numMeasurements').value) || 3;
+            const numTests = parseInt(document.getElementById('numTests').value) || 1;
+            const tireContainer = document.getElementById('tireContainer');
+            
+            // Clear existing content
+            tireContainer.innerHTML = '';
+            
+            // Create sections for each tire
+            TIRE_NAMES.forEach((tireName, tireIndex) => {
+                const tireSection = document.createElement('div');
+                tireSection.className = 'tire-section';
+                
+                const tireTitle = document.createElement('div');
+                tireTitle.className = 'tire-title';
+                tireTitle.textContent = `${tireName} Tire`;
+                tireSection.appendChild(tireTitle);
+                
+                // Create inputs for each measurement and test round
+                for (let testRound = 1; testRound <= numTests; testRound++) {
+                    // Add a label for the test round if there are multiple
+                    if (numTests > 1) {
+                        const roundLabel = document.createElement('div');
+                        roundLabel.style.fontSize = '12px';
+                        roundLabel.style.color = '#666';
+                        roundLabel.style.marginBottom = '8px';
+                        roundLabel.textContent = `Test Round ${testRound}`;
+                        tireSection.appendChild(roundLabel);
+                    }
+                    
+                    const measurementEntry = document.createElement('div');
+                    measurementEntry.className = 'measurement-entry';
+                    
+                    for (let measIndex = 1; measIndex <= numMeasurements; measIndex++) {
+                        const fieldContainer = document.createElement('div');
+                        fieldContainer.style.display = 'flex';
+                        fieldContainer.style.flexDirection = 'column';
+                        fieldContainer.style.gap = '3px';
+                        
+                        const label = document.createElement('div');
+                        label.className = 'measurement-label';
+                        label.textContent = `Measurement ${measIndex}`;
+                        
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.className = 'tire-measurement-input';
+                        input.placeholder = '0';
+                        input.value = '0';
+                        input.min = '0';
+                        input.max = '32';
+                        input.step = '1';
+                        input.setAttribute('data-tire', tireIndex);
+                        input.setAttribute('data-test', testRound);
+                        input.setAttribute('data-measurement', measIndex);
+                        
+                        fieldContainer.appendChild(label);
+                        fieldContainer.appendChild(input);
+                        measurementEntry.appendChild(fieldContainer);
+                    }
+                    
+                    tireSection.appendChild(measurementEntry);
+                }
+                
+                tireContainer.appendChild(tireSection);
+            });
+        }
+
+        function formatNumberWithCommas(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function getTireData() {
+            const tires = [];
+            
+            TIRE_NAMES.forEach((tireName, tireIndex) => {
+                const tireData = {
+                    name: tireName,
+                    testRounds: []
+                };
+                
+                // Get all measurements for this tire
+                const inputs = document.querySelectorAll(`input[data-tire="${tireIndex}"]`);
+                const numTests = Math.max(...Array.from(inputs).map(i => parseInt(i.getAttribute('data-test')))) || 1;
+                
+                for (let testRound = 1; testRound <= numTests; testRound++) {
+                    const measurements = [];
+                    const roundInputs = document.querySelectorAll(`input[data-tire="${tireIndex}"][data-test="${testRound}"]`);
+                    
+                    roundInputs.forEach(input => {
+                        const value = input.value !== '' ? parseFloat(input.value) : null;
+                        measurements.push(value);
+                    });
+                    
+                    if (measurements.some(m => m !== null)) {
+                        tireData.testRounds.push(measurements);
+                    }
+                }
+                
+                tires.push(tireData);
+            });
+            
+            return tires;
+        }
+
+        function generateTireTableHTML(tire) {
+            let html = '<div style="display: flex; flex-direction: column;">';
+            
+            // Determine max measurements for this tire
+            let maxMeasurements = 0;
+            tire.testRounds.forEach(round => {
+                maxMeasurements = Math.max(maxMeasurements, round.length);
+            });
+            
+            // Add tire name as heading
+            html += `<h4 style="color: #0056b3; margin-top: 0; margin-bottom: 10px; text-align: center;">${tire.name}</h4>`;
+            
+            html += '<table class="report-parts-table" style="margin-bottom: 0;">';
+            html += '<thead><tr>';
+            
+            // Create column headers for measurements
+            for (let i = 1; i <= maxMeasurements; i++) {
+                html += `<th style="text-align: center;">Meas. ${i}</th>`;
+            }
+            html += '<th style="text-align: center;">Average</th>';
+            
+            html += '</tr></thead>';
+            html += '<tbody>';
+            
+            // Add rows for each test round
+            tire.testRounds.forEach((measurements, testIndex) => {
+                html += '<tr>';
+                measurements.forEach(measurement => {
+                    let displayValue = '—';
+                    let color = '#333';
+                    if (measurement !== null) {
+                        displayValue = Math.round(measurement);
+                        if (displayValue > 4) {
+                            color = '#28a745'; // Green
+                        } else if (displayValue > 2) {
+                            color = '#ff9800'; // Orange
+                        } else {
+                            color = '#dc3545'; // Red
+                        }
+                    }
+                    html += `<td style="text-align: center; color: ${color}; font-weight: bold;">${displayValue}</td>`;
+                });
+                // Fill remaining cells with dashes
+                for (let i = measurements.length; i < maxMeasurements; i++) {
+                    html += '<td style="text-align: center;">—</td>';
+                }
+                
+                // Calculate average for this test round
+                const validMeasurements = measurements.filter(m => m !== null);
+                let average = '—';
+                let avgColor = '#333';
+                if (validMeasurements.length > 0) {
+                    const sum = validMeasurements.reduce((a, b) => a + b, 0);
+                    average = (sum / validMeasurements.length).toFixed(1);
+                    if (average > 4) {
+                        avgColor = '#28a745'; // Green
+                    } else if (average > 2) {
+                        avgColor = '#ff9800'; // Orange
+                    } else {
+                        avgColor = '#dc3545'; // Red
+                    }
+                }
+                html += `<td style="text-align: center; color: ${avgColor}; font-weight: bold;">${average}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            
+            // Calculate and display overall tire average below the table
+            let allMeasurements = [];
+            tire.testRounds.forEach(round => {
+                allMeasurements = allMeasurements.concat(round.filter(m => m !== null));
+            });
+            
+            let tireAverage = '—';
+            if (allMeasurements.length > 0) {
+                const sum = allMeasurements.reduce((a, b) => a + b, 0);
+                tireAverage = (sum / allMeasurements.length).toFixed(1);
+            }
+            
+            let avgColor = '#0056b3';
+            if (tireAverage !== '—') {
+                if (tireAverage > 4) {
+                    avgColor = '#28a745'; // Green
+                } else if (tireAverage > 2) {
+                    avgColor = '#ff9800'; // Orange
+                } else {
+                    avgColor = '#dc3545'; // Red
+                }
+            }
+            
+            html += `<div style="padding-top: 10px; border-top: 1px solid #ddd; text-align: right;">
+                <strong>Average:</strong> <span style="font-size: 18px; color: ${avgColor}; font-weight: bold;">${tireAverage}</span>
+            </div>`;
+            html += '</div>';
+            
+            return html;
+        }
+
+        function generateAndPrintReport() {
+            const form = document.getElementById('tireForm');
+            
+            // Validate required fields
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const reportOutput = document.getElementById('reportOutput');
+            const tires = getTireData();
+            const mileageValue = document.getElementById('mileage').value;
+            const mileageUnit = document.getElementById('mileageUnit').value;
+            
+            // Build report HTML
+            let reportHTML = '';
+            
+            // Vehicle info - horizontally using same format as index.html
+            reportHTML += '<div class="vehicle-info-horizontal">';
+            const vehicleFields = ['Vehicle Year', 'Vehicle Make', 'Vehicle Model', 'VIN'];
+            vehicleFields.forEach(key => {
+                let value = 'N/A';
+                if (key === 'Vehicle Year') value = document.getElementById('vehicleYear').value || 'N/A';
+                else if (key === 'Vehicle Make') value = document.getElementById('vehicleMake').value || 'N/A';
+                else if (key === 'Vehicle Model') value = document.getElementById('vehicleModel').value || 'N/A';
+                else if (key === 'VIN') value = document.getElementById('vehicleVIN').value || 'N/A';
+                
+                reportHTML += `
+                    <div class="report-item">
+                        <span class="report-label">${key}:</span>
+                        <span class="report-value">${value}</span>
+                    </div>
+                `;
+            });
+            reportHTML += '</div>';
+            
+            // Inspection info - horizontally using same format as index.html
+            reportHTML += '<div class="service-info-horizontal">';
+            reportHTML += `
+                <div class="report-item">
+                    <span class="report-label">Date of Inspection:</span>
+                    <span class="report-value">${document.getElementById('inspectionDate').value || 'N/A'}</span>
+                </div>
+                <div class="report-item">
+                    <span class="report-label">Mileage / Hours:</span>
+                    <span class="report-value">${formatNumberWithCommas(mileageValue)} ${mileageUnit}</span>
+                </div>
+            `;
+            reportHTML += '</div>';
+            
+            // Comments if provided
+            const comments = document.getElementById('comments').value.trim();
+            if (comments) {
+                reportHTML += `
+                    <div class="report-item">
+                        <span class="report-label">Comments:</span>
+                        <span class="report-value">${comments}</span>
+                    </div>
+                `;
+                reportHTML += '<hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">';
+            }
+            
+            // Tire measurements - organized by position (front, rear, spare)
+            reportHTML += '<h3 style="color: #0056b3; margin-bottom: 15px;">Tire Tread Depth Measurements (in 32nds of an inch)</h3>';
+            
+            // Front tires (indices 0 and 1) - side by side
+            reportHTML += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">';
+            
+            for (let tireIndex = 0; tireIndex <= 1; tireIndex++) {
+                const tire = tires[tireIndex];
+                if (tire.testRounds.length > 0) {
+                    reportHTML += generateTireTableHTML(tire);
+                }
+            }
+            
+            reportHTML += '</div>';
+            
+            // Rear tires (indices 2 and 3) - side by side
+            reportHTML += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">';
+            
+            for (let tireIndex = 2; tireIndex <= 3; tireIndex++) {
+                const tire = tires[tireIndex];
+                if (tire.testRounds.length > 0) {
+                    reportHTML += generateTireTableHTML(tire);
+                }
+            }
+            
+            reportHTML += '</div>';
+            
+            // Spare tire (index 4) - centered
+            const spareTire = tires[4];
+            if (spareTire.testRounds.length > 0) {
+                reportHTML += '<div style="display: flex; justify-content: center;">';
+                reportHTML += '<div style="max-width: 500px;">';
+                reportHTML += generateTireTableHTML(spareTire);
+                reportHTML += '</div>';
+                reportHTML += '</div>';
+            }
+            
+            // Update DOM and print
+            reportOutput.innerHTML = reportHTML;
+            reportOutput.style.display = 'block';
+            
+            window.print();
+        }
+
+        function resetForm() {
+            document.getElementById('tireForm').reset();
+            document.getElementById('reportOutput').style.display = 'none';
+            document.getElementById('inspectionDate').value = '';
+            document.getElementById('mileage').value = '';
+            document.getElementById('comments').value = '';
+            document.getElementById('numMeasurements').value = '3';
+            document.getElementById('numTests').value = '1';
+            generateTireFields();
+        }
+    </script>
+</body>
+</html>
