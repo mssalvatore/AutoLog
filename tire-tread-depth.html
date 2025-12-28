@@ -203,13 +203,19 @@
             <hr>
 
             <h2>Measurement Configuration</h2>
+            <p style="color: #666; margin-bottom: 15px;">
+                Measure the tire tread depth at multiple locations across the
+                tread (e.g. inner, middle, outer) to test for uneven wear.
+                Repeat these measurements at multiple locations around the
+                circumference of the tire.
+            </p>
             <div class="config-section">
                 <div class="config-row">
-                    <label for="numMeasurements">Number of measurements per tire:</label>
+                    <label for="numMeasurements">Number of measurements across the tread:</label>
                     <input type="number" id="numMeasurements" value="3" min="1" max="20">
                 </div>
                 <div class="config-row">
-                    <label for="numTests">Number of test rounds:</label>
+                    <label for="numTests">Number of tests around the tire's circumference:</label>
                     <input type="number" id="numTests" value="1" min="1" max="10">
                 </div>
             </div>
@@ -327,7 +333,7 @@
                         roundLabel.style.fontSize = '12px';
                         roundLabel.style.color = '#666';
                         roundLabel.style.marginBottom = '8px';
-                        roundLabel.textContent = `Test Round ${testRound}`;
+                        roundLabel.textContent = `Test ${testRound}`;
                         tireSection.appendChild(roundLabel);
                     }
                     
