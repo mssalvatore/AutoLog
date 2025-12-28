@@ -126,53 +126,9 @@
                 margin: 0.5in;
             }
             
-            /* Hide default browser headers and footers */
-            @page {
-                margin-top: 0;
-                margin-bottom: 0;
-            }
-            
-            /* Remove body margins */
-            body {
-                margin: 0;
-                padding: 0;
-            }
-            
             /* Hide the form and buttons explicitly */
             #tireForm, .buttons {
                 display: none; 
-            }
-            
-            /* Ensure the report is displayed, overriding the default 'display: none' */
-            #reportOutput {
-                display: block !important; 
-                border: none;
-                box-shadow: none;
-                margin: 0;
-                padding: 0;
-                width: 100%;
-            }
-            
-            /* Ensure the main container doesn't accidentally hide content */
-            .container {
-                max-width: 100%;
-                box-shadow: none;
-                margin: 0;
-                padding: 0;
-            }
-            
-            /* Remove extra spacing from the header */
-            h2 {
-                margin-top: 1em;
-                padding-top: 0;
-            }
-            
-            /* Preserve table header background color */
-            .report-parts-table th {
-                background-color: #0056b3 !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
             }
         }
     </style>
