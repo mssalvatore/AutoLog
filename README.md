@@ -38,3 +38,24 @@ so that the report can be printed. The printed report will look similar to the
 one shown below.
 
 <img src="images/example-report.png" width="800px"/>
+
+### Creating a tire tread depth report
+
+Choose "Tire Tread Depth" on the landing page.
+
+<img src="images/tread-depth-form-1.png" width="800px"/>
+
+Specify the number of measurements you'll take across the tread. Then specify
+the number of times this will be done around the tire's circumference. The form
+will automatically be updated with the requisite number of fields.
+
+Fill in the form with the measurements taken from the tires, odometer reading,
+date, and any comments you'd like to include with the report.
+
+<img src="images/tread-depth-form-2.png" width="800px"/>
+
+Click "Generate Report & Print". Your browser will display the "print" dialog so that the
+report can be printed. The printed report will look similar to the one shown
+below.
+
+<img src="images/example-tire-report.png" width="800px"/>
