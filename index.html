@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoLog</title>
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/index.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="images/icon.svg" alt="Logo" class="logo">
+            <h1>AutoLog</h1>
+            <p class="subtitle">Select a report to get started.</p>
+        </div>
+
+        <div class="cards-grid">
+            <a href="maintenance.html" id="maintenanceLink" class="card">
+                <div class="card-icon">
+                    <img src="images/maintenance.svg" alt="Maintenance Icon">
+                </div>
+                <h2>Maintenance Log</h2>
+                <p>Record vehicle maintenance, including oil changes, tire
+                   rotations, brake service, and other repairs.
+                </p>
+                <span class="card-link">Create Report →</span>
+            </a>
+
+            <a href="tire-tread-depth.html" id="tireLink" class="card">
+                <div class="card-icon">
+                    <img src="images/tire.svg" alt="Tire Icon">
+                </div>
+                <h2>Tire Tread Depth</h2>
+                <p>Measure and document tire tread depth across all four tires
+                    to monitor wear patterns.
+                </p>
+                <span class="card-link">Create Report →</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Pass any query parameters to the report links
+        document.addEventListener('DOMContentLoaded', function() {
+            const queryString = window.location.search;
+            
+            if (queryString) {
+                const maintenanceLink = document.getElementById('maintenanceLink');
+                const tireLink = document.getElementById('tireLink');
+                
+                maintenanceLink.href = 'maintenance.html' + queryString;
+                tireLink.href = 'tire-tread-depth.html' + queryString;
+            }
+        });
+    </script>
+</body>
+</html>
