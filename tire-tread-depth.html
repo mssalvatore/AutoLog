@@ -135,16 +135,6 @@
                 
                 // Create inputs for each measurement and test round
                 for (let testRound = 1; testRound <= numTests; testRound++) {
-                    // Add a label for the test round if there are multiple
-                    if (numTests > 1) {
-                        const roundLabel = document.createElement('div');
-                        roundLabel.style.fontSize = '12px';
-                        roundLabel.style.color = '#666';
-                        roundLabel.style.marginBottom = '4px';
-                        roundLabel.textContent = `Test ${testRound}`;
-                        tireSection.appendChild(roundLabel);
-                    }
-                    
                     const measurementEntry = document.createElement('div');
                     measurementEntry.className = 'measurement-entry';
                     
