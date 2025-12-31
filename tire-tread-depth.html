@@ -78,8 +78,8 @@
 
             <h2>Tire Tread Depth Measurements</h2>
             <div class="format-toggle">
-                <label for="depthFormat">Display Format:</label>
-                <select id="depthFormat">
+                <label for="depthUnits">Units:</label>
+                <select id="depthUnits">
                     <option value="32nds" selected>32nds of an inch</option>
                     <option value="decimal">Decimal inches</option>
                 </select>
@@ -118,7 +118,7 @@
             // Attach event listeners
             document.getElementById('numMeasurements').addEventListener('change', generateTireFields);
             document.getElementById('numTests').addEventListener('change', generateTireFields);
-            document.getElementById('depthFormat').addEventListener('change', updateInputFormat);
+            document.getElementById('depthUnits').addEventListener('change', updateInputFormat);
             document.getElementById('generateReport').addEventListener('click', generateAndPrintReport);
             document.getElementById('resetForm').addEventListener('click', resetForm);
         });
@@ -182,7 +182,7 @@
         }
 
         function updateInputFormat() {
-            const format = document.getElementById('depthFormat').value;
+            const format = document.getElementById('depthUnits').value;
             const inputs = document.querySelectorAll('.tire-measurement-input');
             
             inputs.forEach(input => {
@@ -209,7 +209,7 @@
         }
 
         function formatDepthValue(value) {
-            const format = document.getElementById('depthFormat').value;
+            const format = document.getElementById('depthUnits').value;
             if (value === null) return '—';
             
             if (format === '32nds') {
@@ -223,7 +223,7 @@
 
         function getTireData() {
             const tires = [];
-            const format = document.getElementById('depthFormat').value;
+            const format = document.getElementById('depthUnits').value;
             
             TIRE_NAMES.forEach((tireName, tireIndex) => {
                 const tireData = {
