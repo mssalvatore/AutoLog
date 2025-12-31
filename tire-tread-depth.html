@@ -76,7 +76,14 @@
 
             <hr>
 
-            <h2>Tire Tread Depth Measurements (in 32nds of an inch)</h2>
+            <h2>Tire Tread Depth Measurements</h2>
+            <div class="format-toggle">
+                <label for="depthFormat">Display Format:</label>
+                <select id="depthFormat">
+                    <option value="32nds" selected>32nds of an inch</option>
+                    <option value="decimal">Decimal inches</option>
+                </select>
+            </div>
             <div id="tireContainer">
                 <!-- This will be populated by JavaScript based on configuration -->
             </div>
@@ -111,6 +118,7 @@
             // Attach event listeners
             document.getElementById('numMeasurements').addEventListener('change', generateTireFields);
             document.getElementById('numTests').addEventListener('change', generateTireFields);
+            document.getElementById('depthFormat').addEventListener('change', updateInputFormat);
             document.getElementById('generateReport').addEventListener('click', generateAndPrintReport);
             document.getElementById('resetForm').addEventListener('click', resetForm);
         });
@@ -159,6 +167,7 @@
                         input.setAttribute('data-tire', tireIndex);
                         input.setAttribute('data-test', testRound);
                         input.setAttribute('data-measurement', measIndex);
+                        input.setAttribute('data-label', label);
                         
                         fieldContainer.appendChild(label);
                         fieldContainer.appendChild(input);
@@ -172,8 +181,49 @@
             });
         }
 
+        function updateInputFormat() {
+            const format = document.getElementById('depthFormat').value;
+            const inputs = document.querySelectorAll('.tire-measurement-input');
+            
+            inputs.forEach(input => {
+                const currentValue = parseFloat(input.value) || 0;
+                
+                if (format === 'decimal') {
+                    // Convert from 32nds to decimal
+                    const decimalValue = (currentValue / 32).toFixed(3);
+                    input.value = decimalValue;
+                    input.min = '0';
+                    input.max = '1';
+                    input.step = '0.001';
+                    input.placeholder = '0.000';
+                } else {
+                    // Convert from decimal to 32nds
+                    const nthValue = Math.round(currentValue * 32);
+                    input.value = nthValue;
+                    input.min = '0';
+                    input.max = '32';
+                    input.step = '1';
+                    input.placeholder = '0';
+                }
+            });
+        }
+
+        function formatDepthValue(value) {
+            const format = document.getElementById('depthFormat').value;
+            if (value === null) return '—';
+            
+            if (format === '32nds') {
+                return `${Math.round(value)}/32"`;
+            } else {
+                // Convert from 32nds to decimal inches
+                const decimalInches = (value / 32).toFixed(3);
+                return `${decimalInches}"`;
+            }
+        }
+
         function getTireData() {
             const tires = [];
+            const format = document.getElementById('depthFormat').value;
             
             TIRE_NAMES.forEach((tireName, tireIndex) => {
                 const tireData = {
@@ -190,7 +240,11 @@
                     const roundInputs = document.querySelectorAll(`input[data-tire="${tireIndex}"][data-test="${testRound}"]`);
                     
                     roundInputs.forEach(input => {
-                        const value = input.value !== '' ? parseFloat(input.value) : null;
+                        let value = input.value !== '' ? parseFloat(input.value) : null;
+                        // Convert decimal to 32nds if needed
+                        if (value !== null && format === 'decimal') {
+                            value = value * 32;
+                        }
                         measurements.push(value);
                     });
                     
@@ -236,8 +290,8 @@
                     let displayValue = '—';
                     let color = '#333';
                     if (measurement !== null) {
+                        displayValue = formatDepthValue(measurement);
                         const value = Math.round(measurement);
-                        displayValue = `${value}/32"`;
                         if (value > 4) {
                             color = '#28a745'; // Green
                         } else if (value > 2) {
@@ -259,11 +313,12 @@
                 let avgColor = '#333';
                 if (validMeasurements.length > 0) {
                     const sum = validMeasurements.reduce((a, b) => a + b, 0);
-                    const avgValue = Math.round(sum / validMeasurements.length);
-                    average = `${avgValue}/32"`;
-                    if (avgValue > 4) {
+                    const avgValue = sum / validMeasurements.length;
+                    average = formatDepthValue(avgValue);
+                    const roundedAvg = Math.round(avgValue);
+                    if (roundedAvg > 4) {
                         avgColor = '#28a745'; // Green
-                    } else if (avgValue > 2) {
+                    } else if (roundedAvg > 2) {
                         avgColor = '#ff9800'; // Orange
                     } else {
                         avgColor = '#dc3545'; // Red
@@ -282,18 +337,17 @@
             });
             
             let tireAverage = '—';
+            let avgColor = '#0056b3';
             if (allMeasurements.length > 0) {
                 const sum = allMeasurements.reduce((a, b) => a + b, 0);
-                const avgValue = Math.round(sum / allMeasurements.length);
-                tireAverage = `${avgValue}/32"`;
-            }
-            
-            let avgColor = '#0056b3';
-            if (tireAverage !== '—') {
-                const numValue = parseInt(tireAverage);
-                if (numValue > 4) {
+                const avgValue = sum / allMeasurements.length;
+                tireAverage = formatDepthValue(avgValue);
+                
+                // Determine color based on the actual numeric value (in 32nds)
+                const roundedAvg = Math.round(avgValue);
+                if (roundedAvg > 4) {
                     avgColor = '#28a745'; // Green
-                } else if (numValue > 2) {
+                } else if (roundedAvg > 2) {
                     avgColor = '#ff9800'; // Orange
                 } else {
                     avgColor = '#dc3545'; // Red
@@ -306,6 +360,15 @@
             html += '</div>';
             
             return html;
+        }
+
+        function updateReportDisplay() {
+            // If a report is already displayed, regenerate it with the new format
+            const reportOutput = document.getElementById('reportOutput');
+            if (reportOutput.children.length > 1) {
+                // Report has been generated, so regenerate it
+                generateAndPrintReport();
+            }
         }
 
         function generateAndPrintReport() {
@@ -371,7 +434,7 @@
             }
             
             // Tire measurements - organized by position (front, rear, spare)
-            reportHTML += '<h3 style="color: #0056b3; margin-bottom: 15px; margin-top: 5px;">Tire Tread Depth Measurements (in 32nds of an inch)</h3>';
+            reportHTML += '<h3 style="color: #0056b3; margin-bottom: 15px; margin-top: 5px;">Tire Tread Depth Measurements</h3>';
             
             // Front tires (indices 0 and 1) - side by side
             reportHTML += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px;">';

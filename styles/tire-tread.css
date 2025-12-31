@@ -47,6 +47,29 @@
     text-align: center;
     margin-bottom: 1px;
 }
+.format-toggle {
+    background-color: #f0f8ff;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-top: 20px;
+    margin-bottom: 25px;
+    border: 1px solid #b3d9ff;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.format-toggle label {
+    font-weight: bold;
+    margin-bottom: 0;
+    color: #0056b3;
+}
+.format-toggle select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
 .config-section {
     background-color: #e3f2fd;
     padding: 15px;
