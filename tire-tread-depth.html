@@ -160,7 +160,6 @@
                         input.type = 'number';
                         input.className = 'tire-measurement-input';
                         input.placeholder = '0';
-                        input.value = '0';
                         input.min = '0';
                         input.max = '32';
                         input.step = '1';
@@ -221,6 +220,17 @@
             }
         }
 
+        function getColorForValue(value) {
+            const roundedValue = Math.round(value);
+            if (roundedValue > 4) {
+                return '#28a745'; // Green
+            } else if (roundedValue > 2) {
+                return '#ff9800'; // Orange
+            } else {
+                return '#dc3545'; // Red
+            }
+        }
+
         function getTireData() {
             const tires = [];
             const format = document.getElementById('depthUnits').value;
@@ -240,9 +250,9 @@
                     const roundInputs = document.querySelectorAll(`input[data-tire="${tireIndex}"][data-test="${testRound}"]`);
                     
                     roundInputs.forEach(input => {
-                        let value = input.value !== '' ? parseFloat(input.value) : null;
+                        let value = input.value !== '' ? parseFloat(input.value) : 0;
                         // Convert decimal to 32nds if needed
-                        if (value !== null && format === 'decimal') {
+                        if (value !== 0 && format === 'decimal') {
                             value = value * 32;
                         }
                         measurements.push(value);
@@ -291,14 +301,7 @@
                     let color = '#333';
                     if (measurement !== null) {
                         displayValue = formatDepthValue(measurement);
-                        const value = Math.round(measurement);
-                        if (value > 4) {
-                            color = '#28a745'; // Green
-                        } else if (value > 2) {
-                            color = '#ff9800'; // Orange
-                        } else {
-                            color = '#dc3545'; // Red
-                        }
+                        color = getColorForValue(measurement);
                     }
                     html += `<td style="text-align: center; color: ${color}; font-weight: bold;">${displayValue}</td>`;
                 });
@@ -315,14 +318,7 @@
                     const sum = validMeasurements.reduce((a, b) => a + b, 0);
                     const avgValue = sum / validMeasurements.length;
                     average = formatDepthValue(avgValue);
-                    const roundedAvg = Math.round(avgValue);
-                    if (roundedAvg > 4) {
-                        avgColor = '#28a745'; // Green
-                    } else if (roundedAvg > 2) {
-                        avgColor = '#ff9800'; // Orange
-                    } else {
-                        avgColor = '#dc3545'; // Red
-                    }
+                    avgColor = getColorForValue(avgValue);
                 }
                 html += `<td style="text-align: center; color: ${avgColor}; font-weight: bold;">${average}</td>`;
                 html += '</tr>';
@@ -342,16 +338,7 @@
                 const sum = allMeasurements.reduce((a, b) => a + b, 0);
                 const avgValue = sum / allMeasurements.length;
                 tireAverage = formatDepthValue(avgValue);
-                
-                // Determine color based on the actual numeric value (in 32nds)
-                const roundedAvg = Math.round(avgValue);
-                if (roundedAvg > 4) {
-                    avgColor = '#28a745'; // Green
-                } else if (roundedAvg > 2) {
-                    avgColor = '#ff9800'; // Orange
-                } else {
-                    avgColor = '#dc3545'; // Red
-                }
+                avgColor = getColorForValue(avgValue);
             }
             
             html += `<div style="padding-top: 10px; border-top: 1px solid #ddd; text-align: right;">
